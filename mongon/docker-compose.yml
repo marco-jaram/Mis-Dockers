@@ -1,0 +1,40 @@
+
+services:
+  mongo:
+    image: ubuntu
+    container_name: mongon-ubuntu
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data:/data/db
+    command: bash -c "apt-get update && apt-get install -y gnupg curl && \
+                      curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | \
+                      gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor && \
+                      echo 'deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse' | \
+                      tee /etc/apt/sources.list.d/mongodb-org-7.0.list && \
+                      apt-get update && apt-get install -y mongodb-org && \
+                      mkdir -p /data/db && mongod --dbpath /data/db"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    networks:
+      - mynetwork
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongon-express
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: secret
+      ME_CONFIG_MONGODB_PORT: 27017
+    ports:
+      - "8081:8081"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge

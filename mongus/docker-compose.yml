@@ -1,0 +1,15 @@
+services:
+  mongo:
+    image: mongo:latest  
+    container_name: monguito
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: admin
+   
+
